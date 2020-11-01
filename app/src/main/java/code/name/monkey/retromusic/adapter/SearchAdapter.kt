@@ -1,9 +1,24 @@
+/*
+ * Copyright (c) 2020 Hemanth Savarla.
+ *
+ * Licensed under the GNU General Public License v3
+ *
+ * This is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
+ *
+ */
 package code.name.monkey.retromusic.adapter
 
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
+import androidx.core.view.isGone
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentActivity
@@ -12,6 +27,7 @@ import androidx.recyclerview.widget.RecyclerView
 import code.name.monkey.appthemehelper.ThemeStore
 import code.name.monkey.retromusic.*
 import code.name.monkey.retromusic.adapter.base.MediaEntryViewHolder
+import code.name.monkey.retromusic.db.PlaylistEntity
 import code.name.monkey.retromusic.db.PlaylistWithSongs
 import code.name.monkey.retromusic.glide.AlbumGlideRequest
 import code.name.monkey.retromusic.glide.ArtistGlideRequest
@@ -38,7 +54,7 @@ class SearchAdapter(
         if (dataSet[position] is Album) return ALBUM
         if (dataSet[position] is Artist) return ARTIST
         if (dataSet[position] is Genre) return GENRE
-        if (dataSet[position] is PlaylistWithSongs) return PLAYLIST
+        if (dataSet[position] is PlaylistEntity) return PLAYLIST
         return if (dataSet[position] is Song) SONG else HEADER
     }
 
@@ -60,7 +76,7 @@ class SearchAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         when (getItemViewType(position)) {
             ALBUM -> {
-                holder. imageTextContainer?.isVisible = true
+                holder.imageTextContainer?.isVisible = true
                 val album = dataSet[position] as Album
                 holder.title?.text = album.title
                 holder.text?.text = album.artistName
@@ -68,7 +84,7 @@ class SearchAdapter(
                     .checkIgnoreMediaStore().build().into(holder.image)
             }
             ARTIST -> {
-                holder. imageTextContainer?.isVisible = true
+                holder.imageTextContainer?.isVisible = true
                 val artist = dataSet[position] as Artist
                 holder.title?.text = artist.name
                 holder.text?.text = MusicUtil.getArtistInfoString(activity, artist)
@@ -93,9 +109,9 @@ class SearchAdapter(
                 )
             }
             PLAYLIST -> {
-                val playlist = dataSet[position] as PlaylistWithSongs
-                holder.title?.text = playlist.playlistEntity.playlistName
-                holder.text?.text = MusicUtil.playlistInfoString(activity, playlist.songs)
+                val playlist = dataSet[position] as PlaylistEntity
+                holder.title?.text = playlist.playlistName
+                //holder.text?.text = MusicUtil.playlistInfoString(activity, playlist.songs)
             }
             else -> {
                 holder.title?.text = dataSet[position].toString()
@@ -123,6 +139,7 @@ class SearchAdapter(
             itemView.setOnLongClickListener(null)
             imageTextContainer?.isInvisible = true
             if (itemViewType == SONG) {
+                imageTextContainer?.isGone = true
                 menu?.visibility = View.VISIBLE
                 menu?.setOnClickListener(object : SongMenuHelper.OnClickSongMenu(activity) {
                     override val song: Song

@@ -2,8 +2,24 @@ package code.name.monkey.retromusic.repository
 
 import androidx.annotation.WorkerThread
 import androidx.lifecycle.LiveData
-import code.name.monkey.retromusic.db.*
+import code.name.monkey.retromusic.db.BlackListStoreDao
+import code.name.monkey.retromusic.db.BlackListStoreEntity
+import code.name.monkey.retromusic.db.HistoryDao
+import code.name.monkey.retromusic.db.HistoryEntity
+import code.name.monkey.retromusic.db.LyricsDao
+import code.name.monkey.retromusic.db.PlayCountDao
+import code.name.monkey.retromusic.db.PlayCountEntity
+import code.name.monkey.retromusic.db.PlaylistDao
+import code.name.monkey.retromusic.db.PlaylistEntity
+import code.name.monkey.retromusic.db.PlaylistWithSongs
+import code.name.monkey.retromusic.db.SongEntity
+import code.name.monkey.retromusic.db.toHistoryEntity
+import code.name.monkey.retromusic.helper.SortOrder.PlaylistSortOrder.Companion.PLAYLIST_A_Z
+import code.name.monkey.retromusic.helper.SortOrder.PlaylistSortOrder.Companion.PLAYLIST_SONG_COUNT
+import code.name.monkey.retromusic.helper.SortOrder.PlaylistSortOrder.Companion.PLAYLIST_SONG_COUNT_DESC
+import code.name.monkey.retromusic.helper.SortOrder.PlaylistSortOrder.Companion.PLAYLIST_Z_A
 import code.name.monkey.retromusic.model.Song
+import code.name.monkey.retromusic.util.PreferenceUtil
 
 
 interface RoomRepository {
@@ -11,7 +27,7 @@ interface RoomRepository {
     fun favoritePlaylistLiveData(favorite: String): LiveData<List<SongEntity>>
     fun insertBlacklistPath(blackListStoreEntity: BlackListStoreEntity)
     fun observableHistorySongs(): LiveData<List<HistoryEntity>>
-    fun getSongs(playlistEntity: PlaylistEntity): LiveData<List<SongEntity>>
+    fun getSongs(playListId: Long): LiveData<List<SongEntity>>
     suspend fun createPlaylist(playlistEntity: PlaylistEntity): Long
     suspend fun checkPlaylistExists(playlistName: String): List<PlaylistEntity>
     suspend fun playlists(): List<PlaylistEntity>
@@ -61,7 +77,22 @@ class RealRoomRepository(
 
     @WorkerThread
     override suspend fun playlistWithSongs(): List<PlaylistWithSongs> =
-        playlistDao.playlistsWithSongs()
+        when (PreferenceUtil.playlistSortOrder) {
+            PLAYLIST_A_Z ->
+                playlistDao.playlistsWithSongs().sortedBy {
+                    it.playlistEntity.playlistName
+                }
+            PLAYLIST_Z_A -> playlistDao.playlistsWithSongs()
+                .sortedByDescending {
+                    it.playlistEntity.playlistName
+                }
+            PLAYLIST_SONG_COUNT -> playlistDao.playlistsWithSongs().sortedBy { it.songs.size }
+            PLAYLIST_SONG_COUNT_DESC -> playlistDao.playlistsWithSongs()
+                .sortedByDescending { it.songs.size }
+            else -> playlistDao.playlistsWithSongs().sortedBy {
+                it.playlistEntity.playlistName
+            }
+        }
 
     @WorkerThread
     override suspend fun insertSongs(songs: List<SongEntity>) {
@@ -70,8 +101,8 @@ class RealRoomRepository(
     }
 
 
-    override fun getSongs(playlistEntity: PlaylistEntity): LiveData<List<SongEntity>> =
-        playlistDao.songsFromPlaylist(playlistEntity.playListId)
+    override fun getSongs(playListId: Long): LiveData<List<SongEntity>> =
+        playlistDao.songsFromPlaylist(playListId)
 
     override suspend fun deletePlaylistEntities(playlistEntities: List<PlaylistEntity>) =
         playlistDao.deletePlaylists(playlistEntities)

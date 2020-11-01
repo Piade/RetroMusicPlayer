@@ -1,3 +1,17 @@
+/*
+ * Copyright (c) 2020 Hemanth Savarla.
+ *
+ * Licensed under the GNU General Public License v3
+ *
+ * This is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
+ *
+ */
 package code.name.monkey.retromusic.adapter
 
 import android.view.LayoutInflater
@@ -24,6 +38,7 @@ import code.name.monkey.retromusic.glide.SongGlideRequest
 import code.name.monkey.retromusic.helper.MusicPlayerRemote
 import code.name.monkey.retromusic.interfaces.IAlbumClickListener
 import code.name.monkey.retromusic.interfaces.IArtistClickListener
+import code.name.monkey.retromusic.interfaces.IGenreClickListener
 import code.name.monkey.retromusic.model.*
 import code.name.monkey.retromusic.util.PreferenceUtil
 import com.bumptech.glide.Glide
@@ -31,7 +46,8 @@ import com.google.android.material.card.MaterialCardView
 
 class HomeAdapter(
     private val activity: AppCompatActivity
-) : RecyclerView.Adapter<RecyclerView.ViewHolder>(), IArtistClickListener, IAlbumClickListener {
+) : RecyclerView.Adapter<RecyclerView.ViewHolder>(), IArtistClickListener, IAlbumClickListener,
+    IGenreClickListener {
 
     private var list = listOf<Home>()
 
@@ -121,7 +137,6 @@ class HomeAdapter(
                 viewHolder.bind(home)
             }
             PLAYLISTS -> {
-
             }
         }
     }
@@ -181,7 +196,6 @@ class HomeAdapter(
                     .asBitmap()
                     .build()
                     .into(itemView.findViewById(id))
-
             }
         }
     }
@@ -208,7 +222,8 @@ class HomeAdapter(
             val genreAdapter = GenreAdapter(
                 activity,
                 home.arrayList as List<Genre>,
-                R.layout.item_grid_genre
+                R.layout.item_grid_genre,
+                this@HomeAdapter
             )
             recyclerView.apply {
                 layoutManager = GridLayoutManager(activity, 3, GridLayoutManager.HORIZONTAL, false)
@@ -255,4 +270,16 @@ class HomeAdapter(
             )
         )
     }
+
+    override fun onClickGenre(genre: Genre, view: View) {
+        activity.findNavController(R.id.fragment_container).navigate(
+            R.id.genreDetailsFragment,
+            bundleOf(EXTRA_GENRE to genre),
+            null,
+            FragmentNavigatorExtras(
+                view to "genre"
+            )
+        )
+    }
+
 }

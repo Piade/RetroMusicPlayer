@@ -1,10 +1,28 @@
+/*
+ * Copyright (c) 2020 Hemanth Savarla.
+ *
+ * Licensed under the GNU General Public License v3
+ *
+ * This is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
+ *
+ */
 package code.name.monkey.retromusic.fragments.base
 
 import android.os.Bundle
-import android.view.*
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
+import android.view.View
 import androidx.annotation.NonNull
 import androidx.annotation.StringRes
 import androidx.core.text.HtmlCompat
+import androidx.core.view.updatePadding
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import code.name.monkey.appthemehelper.ThemeStore
@@ -14,16 +32,12 @@ import code.name.monkey.retromusic.R
 import code.name.monkey.retromusic.dialogs.CreatePlaylistDialog
 import code.name.monkey.retromusic.dialogs.ImportPlaylistDialog
 import code.name.monkey.retromusic.helper.MusicPlayerRemote
-import code.name.monkey.retromusic.state.NowPlayingPanelState
 import code.name.monkey.retromusic.util.DensityUtil
 import code.name.monkey.retromusic.util.ThemedFastScroller.create
-import code.name.monkey.retromusic.views.ScrollingViewOnApplyWindowInsetsListener
 import com.google.android.material.appbar.AppBarLayout
-import com.google.android.material.transition.Hold
 import kotlinx.android.synthetic.main.fragment_main_recycler.*
 import me.zhanghai.android.fastscroll.FastScroller
 import me.zhanghai.android.fastscroll.FastScrollerBuilder
-
 
 abstract class AbsRecyclerViewFragment<A : RecyclerView.Adapter<*>, LM : RecyclerView.LayoutManager> :
     AbsMainActivityFragment(R.layout.fragment_main_recycler),
@@ -37,18 +51,9 @@ abstract class AbsRecyclerViewFragment<A : RecyclerView.Adapter<*>, LM : Recycle
     protected var adapter: A? = null
     protected var layoutManager: LM? = null
 
-    private fun setUpTransitions() {
-        exitTransition = Hold()
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setUpTransitions()
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        libraryViewModel.setPanelState(NowPlayingPanelState.COLLAPSED_WITH)
+        mainActivity.setBottomBarVisibility(View.VISIBLE)
         mainActivity.setSupportActionBar(toolbar)
         mainActivity.supportActionBar?.title = null
         initLayoutManager()
@@ -79,12 +84,7 @@ abstract class AbsRecyclerViewFragment<A : RecyclerView.Adapter<*>, LM : Recycle
             layoutManager = this@AbsRecyclerViewFragment.layoutManager
             adapter = this@AbsRecyclerViewFragment.adapter
             val fastScroller = create(this)
-            setOnApplyWindowInsetsListener(
-                ScrollingViewOnApplyWindowInsetsListener(
-                    recyclerView,
-                    fastScroller
-                )
-            )
+
         }
         checkForPadding()
     }
@@ -118,16 +118,15 @@ abstract class AbsRecyclerViewFragment<A : RecyclerView.Adapter<*>, LM : Recycle
 
     private fun checkForPadding() {
         val itemCount: Int = adapter?.itemCount ?: 0
-        val params = container.layoutParams as ViewGroup.MarginLayoutParams
+
         if (itemCount > 0 && MusicPlayerRemote.playingQueue.isNotEmpty()) {
-            val height = DensityUtil.dip2px(requireContext(), 104f)
-            params.bottomMargin = height
+            val height = DensityUtil.dip2px(requireContext(), 112f)
+            recyclerView.updatePadding(0, 0, 0, height)
         } else {
-            val height = DensityUtil.dip2px(requireContext(), 52f)
-            params.bottomMargin = height
+            val height = DensityUtil.dip2px(requireContext(), 56f)
+            recyclerView.updatePadding(0, 0, 0, height)
         }
     }
-
 
     private fun initLayoutManager() {
         layoutManager = createLayoutManager()
@@ -139,12 +138,12 @@ abstract class AbsRecyclerViewFragment<A : RecyclerView.Adapter<*>, LM : Recycle
     protected abstract fun createAdapter(): A
 
     override fun onOffsetChanged(p0: AppBarLayout?, i: Int) {
-        container.setPadding(
-            container.paddingLeft,
-            container.paddingTop,
-            container.paddingRight,
+        /*recyclerView.setPadding(
+            recyclerView.paddingLeft,
+            recyclerView.paddingTop,
+            recyclerView.paddingRight,
             i
-        )
+        )*/
     }
 
     override fun onQueueChanged() {

@@ -16,8 +16,8 @@ android {
         vectorDrawables.useSupportLibrary = true
 
         applicationId "code.name.monkey.retromusic"
-        versionCode 10445
-        versionName '3.6.100' + "_" + getDate()
+        versionCode 10503
+        versionName '4.0.010' + "_" + getDate()
 
         multiDexEnabled true
 
@@ -25,7 +25,7 @@ android {
     }
     signingConfigs {
         release {
-            Properties properties = getProperties('/Users/apple/Documents/Github/retro.properties ')
+            Properties properties = getProperties('E:/Documents/GitHub/retro.properties')
             storeFile file(getProperty(properties, 'storeFile'))
             keyAlias getProperty(properties, 'keyAlias')
             storePassword getProperty(properties, 'storePassword')
@@ -167,3 +167,5 @@ dependencies {
     implementation 'org.jsoup:jsoup:1.11.1'
     debugImplementation 'com.amitshekhar.android:debug-db:1.0.6'
 }
+
+apply from: '../spotless.gradle'

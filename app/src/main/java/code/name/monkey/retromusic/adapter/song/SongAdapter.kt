@@ -1,3 +1,17 @@
+/*
+ * Copyright (c) 2020 Hemanth Savarla.
+ *
+ * Licensed under the GNU General Public License v3
+ *
+ * This is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
+ *
+ */
 package code.name.monkey.retromusic.adapter.song
 
 import android.content.res.ColorStateList
@@ -60,7 +74,7 @@ open class SongAdapter(
     }
 
     override fun getItemId(position: Int): Long {
-        return dataSet[position].id.toLong()
+        return dataSet[position].id
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -97,6 +111,7 @@ open class SongAdapter(
             holder.title?.setTextColor(color.primaryTextColor)
             holder.text?.setTextColor(color.secondaryTextColor)
             holder.paletteColorContainer?.setBackgroundColor(color.backgroundColor)
+            holder.menu?.imageTintList= ColorStateList.valueOf(color.primaryTextColor)
         }
         holder.mask?.backgroundTintList = ColorStateList.valueOf(color.primaryTextColor)
     }
@@ -163,7 +178,6 @@ open class SongAdapter(
             get() = dataSet[layoutPosition]
 
         init {
-            setImageTransitionName(activity.getString(R.string.transition_album_art))
             menu?.setOnClickListener(object : SongMenuHelper.OnClickSongMenu(activity) {
                 override val song: Song
                     get() = this@ViewHolder.song

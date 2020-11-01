@@ -1,17 +1,17 @@
 /*
- * Copyright (c) 2020 Hemanth Savarala.
+ * Copyright (c) 2020 Hemanth Savarla.
  *
  * Licensed under the GNU General Public License v3
  *
- * This is free software: you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by
- *  the Free Software Foundation either version 3 of the License, or (at your option) any later version.
+ * This is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
  *
  * This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
  * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * See the GNU General Public License for more details.
+ *
  */
-
 package code.name.monkey.retromusic.fragments.home
 
 import android.app.ActivityOptions
@@ -29,17 +29,13 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import code.name.monkey.appthemehelper.ThemeStore
 import code.name.monkey.appthemehelper.common.ATHToolbarActivity
 import code.name.monkey.appthemehelper.util.ToolbarContentTintHelper
-import code.name.monkey.retromusic.HISTORY_PLAYLIST
-import code.name.monkey.retromusic.LAST_ADDED_PLAYLIST
-import code.name.monkey.retromusic.R
-import code.name.monkey.retromusic.TOP_PLAYED_PLAYLIST
+import code.name.monkey.retromusic.*
 import code.name.monkey.retromusic.adapter.HomeAdapter
 import code.name.monkey.retromusic.dialogs.CreatePlaylistDialog
 import code.name.monkey.retromusic.dialogs.ImportPlaylistDialog
 import code.name.monkey.retromusic.fragments.base.AbsMainActivityFragment
 import code.name.monkey.retromusic.glide.ProfileBannerGlideRequest
 import code.name.monkey.retromusic.glide.UserProfileGlideRequest
-import code.name.monkey.retromusic.state.NowPlayingPanelState
 import code.name.monkey.retromusic.util.NavigationUtil
 import code.name.monkey.retromusic.util.PreferenceUtil
 import com.bumptech.glide.Glide
@@ -52,7 +48,7 @@ class HomeFragment :
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        libraryViewModel.setPanelState(NowPlayingPanelState.COLLAPSED_WITH)
+        mainActivity.setBottomBarVisibility(View.VISIBLE)
         mainActivity.setSupportActionBar(toolbar)
         mainActivity.supportActionBar?.title = null
         setStatusBarColorAuto(view)
@@ -68,14 +64,14 @@ class HomeFragment :
         lastAdded.setOnClickListener {
             findNavController().navigate(
                 R.id.detailListFragment,
-                bundleOf("type" to LAST_ADDED_PLAYLIST)
+                bundleOf(EXTRA_PLAYLIST_TYPE to LAST_ADDED_PLAYLIST)
             )
         }
 
         topPlayed.setOnClickListener {
             findNavController().navigate(
                 R.id.detailListFragment,
-                bundleOf("type" to TOP_PLAYED_PLAYLIST)
+                bundleOf(EXTRA_PLAYLIST_TYPE to TOP_PLAYED_PLAYLIST)
             )
         }
 
@@ -86,7 +82,7 @@ class HomeFragment :
         history.setOnClickListener {
             findNavController().navigate(
                 R.id.detailListFragment,
-                bundleOf("type" to HISTORY_PLAYLIST)
+                bundleOf(EXTRA_PLAYLIST_TYPE to HISTORY_PLAYLIST)
             )
         }
 
